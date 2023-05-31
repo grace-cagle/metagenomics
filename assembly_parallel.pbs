@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#PBS -l nodes=10:ppn=16
+#PBS -l walltime=5:00:00
+#PBS -q checkpt
+#PBS -A hpc_houmicro03
+#PBS -N assembly_parallel
+#PBS -o assembly_parallel.out
+#PBS -e assembly_parallel.err
+
+JOBS_PER_NODE=1
+NTHREADS=16
+
+export WDIR=/work/gcagle1/
+cd $WDIR
+FILEPATH=assemblyFilesRemaining.txt
+
+module load gnuparallel/20180222/INTEL-18.0.0
+
+# the parallel command
+parallel --progress -j $JOBS_PER_NODE --slf $PBS_NODEFILE --workdir $WDIR $PBS_O_WORKDIR/megahit_parallel.sh {} '{= s:.*1a-::; s:_[^_]+$::;=}' $NTHREADS :::: $FILEPATH
